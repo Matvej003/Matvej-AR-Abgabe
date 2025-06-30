@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AimLabs VR Training</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- UI Elements -->
+    <div id="ui">
+        <div>Score: <span id="score">0</span></div>
+        <div>Misses: <span id="misses">0</span></div>
+        <div>Accuracy: <span id="accuracy">0%</span></div>
+        <div>Time: <span id="timer">60</span>s</div>
+    </div>
+    
+    <div id="crosshair"></div>
+    
+    <div id="instructions">
+        <strong>Steuerung:</strong><br>
+        • Maus bewegen = Umsehen<br>
+        • Linke Maustaste = Schießen<br>
+        • R = Restart<br>
+        • ESC = Mauszeiger freigeben
+    </div>
+
+    <!-- A-Frame Scene -->
+    <a-scene 
+        vr-mode-ui="enabled: true"
+        cursor="rayOrigin: mouse"
+        raycaster="objects: .target"
+        background="color: #001122">
+        
+        <!-- Assets -->
+        <a-assets>
+            <a-mixin id="target" 
+                     geometry="primitive: sphere; radius: 0.3"
+                     material="color: #ff4444; metalness: 0.2; roughness: 0.8"
+                     animation__pulse="property: scale; to: 1.2 1.2 1.2; dur: 500; dir: alternate; loop: true"
+                     class="target">
+            </a-mixin>
+            
+            <a-mixin id="hit-target"
+                     geometry="primitive: sphere; radius: 0.3"
+                     material="color: #44ff44; metalness: 0.2; roughness: 0.8"
+                     animation__explode="property: scale; to: 2 2 2; dur: 200; easing: easeOutQuad"
+                     animation__fade="property: material.opacity; to: 0; dur: 200; delay: 200">
+            </a-mixin>
+        </a-assets>
+
+        <!-- Environment -->
+        <a-sky color="#001122"></a-sky>
+        
+        <!-- Grid floor -->
+        <a-plane 
+            position="0 -2 0" 
+            rotation="-90 0 0" 
+            width="50" 
+            height="50" 
+            color="#003366"
+            material="wireframe: true; opacity: 0.3">
+        </a-plane>
+
+        <!-- Lighting -->
+        <a-light type="ambient" color="#404040" intensity="0.5"></a-light>
+        <a-light type="directional" position="5 10 5" color="#ffffff" intensity="0.8"></a-light>
+
+        <!-- Camera with mouse controls -->
+        <a-entity id="cameraRig" position="0 1.6 3">
+            <a-camera 
+                id="camera"
+                look-controls="pointerLockEnabled: true; reverseMouseDrag: false"
+                wasd-controls="enabled: false"
+                cursor="rayOrigin: mouse">
+            </a-camera>
+        </a-entity>
+
+    </a-scene>
+<audio id="hitSound" src="plop.mp4" preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
