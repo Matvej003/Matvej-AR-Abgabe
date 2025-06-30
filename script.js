@@ -29,7 +29,8 @@ function spawnTargets(count = 10) {
         const target = document.createElement('a-sphere');
         const radius = (Math.random() * 0.3 + 0.2).toFixed(2);
         target.setAttribute('radius', radius);
-        target.setAttribute('color', '#FF4444');
+        target.setAttribute('material', 'color: #ff4444; shader: flat');
+
         target.setAttribute('class', 'target');
         
         // Zufällige Position innerhalb eines Radius generieren
