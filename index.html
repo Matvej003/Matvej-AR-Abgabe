@@ -4,25 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ball Hitter VR</title>
+    
+   
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    
+  
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- Start Screen -->
+
 <div id="startScreen">
     <button id="startButton">START</button>
     <div id="gameDescription">Treffe 30 Kugeln bevor die Zeit abläuft</div>
 </div>
 
-<!-- Game Over Screen -->
+
 <div id="gameOverScreen">
     <div id="gameOverMessage"></div>
     <div id="gameStats"></div>
     <button id="restartButton">NOCHMAL SPIELEN</button>
 </div>
 
-<!-- UI Elements -->
+
 <div id="ui">
     <div>Score: <span id="score">0</span></div>
     <div>Misses: <span id="misses">0</span></div>
@@ -30,8 +34,10 @@
     <div>Time: <span id="timer">60</span>s</div>
 </div>
 
+
 <div id="crosshair"></div>
 
+<!-- Spielanleitung am unteren Bildschirmrand -->
 <div id="instructions">
     <strong>Steuerung:</strong><br>
     • Maus bewegen = Umsehen<br>
@@ -40,36 +46,43 @@
     • ESC = Mauszeiger freigeben
 </div>
 
+<!-- Hauptszene der A-Frame VR-Welt -->
 <a-scene 
-    vr-mode-ui="enabled: true"
     cursor="rayOrigin: mouse"
     raycaster="objects: .target"
     background="color: #001122">
 
+    <!-- Hier werden Vorlagen (Mixins) für Objekte definiert -->
     <a-assets>
-        <a-mixin id="target" geometry="primitive: sphere; radius: 0.3"
+
+        <!-- Vorlage für eine Zielkugel -->
+        <a-mixin id="target"
+                 geometry="primitive: sphere; radius: 0.3"
                  material="color: #ff4444; metalness: 0.2; roughness: 0.8"
                  animation__pulse="property: scale; to: 1.2 1.2 1.2; dur: 500; dir: alternate; loop: true"
                  class="target">
         </a-mixin>
 
-        <a-mixin id="hit-target"
-                 geometry="primitive: sphere; radius: 0.3"
-                 material="color: #44ff44; metalness: 0.2; roughness: 0.8"
-                 animation__explode="property: scale; to: 2 2 2; dur: 200; easing: easeOutQuad"
-                 animation__fade="property: material.opacity; to: 0; dur: 200; delay: 200">
-        </a-mixin>
+
     </a-assets>
 
+    <!-- Hintergrundfarbe des "Himmels" -->
     <a-sky color="#001122"></a-sky>
 
-    <a-plane position="0 -2 0" rotation="-90 0 0" width="50" height="50"
-             color="#003366" material="wireframe: true; opacity: 0.3">
+    <!-- Boden (Rastergitter) -->
+    <a-plane position="0 -2 0"
+             rotation="-90 0 0"
+             width="50"
+             height="50"
+             color="#003366"
+             material="wireframe: true; opacity: 0.3">
     </a-plane>
 
+    <!-- Lichtquellen -->
     <a-light type="ambient" color="#404040" intensity="0.5"></a-light>
     <a-light type="directional" position="5 10 5" color="#ffffff" intensity="0.8"></a-light>
 
+    <!-- Kamera & Steuerung (Kopfbewegung + Maus) -->
     <a-entity id="cameraRig" position="0 1.6 3">
         <a-camera id="camera"
                   look-controls="pointerLockEnabled: true; reverseMouseDrag: false"
@@ -77,9 +90,13 @@
                   cursor="rayOrigin: mouse">
         </a-camera>
     </a-entity>
+
 </a-scene>
 
+<!-- Soundeffekt beim Treffen eines Balls -->
 <audio id="hitSound" src="plop.mp4" preload="auto"></audio>
+
+<!-- Hauptlogik über externes JavaScript -->
 <script src="script.js"></script>
 </body>
 </html>
