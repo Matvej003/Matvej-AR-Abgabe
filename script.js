@@ -48,7 +48,7 @@ function destroyTarget(el, hit) {
         const hitSound = document.getElementById('hitSound');
         if (hitSound) {
             hitSound.currentTime = 0;
-            hitSound.play().catch(() => {}); // Ignore audio errors
+            hitSound.play().catch(() => {});
         }
     }
 
@@ -56,7 +56,7 @@ function destroyTarget(el, hit) {
     updateUI();
 
     if (gameState.score >= 30) {
-        endGame("🎉 GEWONNEN! 🎉");
+        endGame("GEWONNEN!");
     } else if (gameState.gameActive) {
         spawnTargets(1);
     }
@@ -107,7 +107,7 @@ function startTimer() {
         gameState.timeLeft--;
         updateUI();
         if (gameState.timeLeft <= 0) {
-            endGame("⏰ Zeit abgelaufen! ⏰");
+            endGame("Zeit abgelaufen!");
             clearInterval(gameTimer);
         }
     }, 1000);
