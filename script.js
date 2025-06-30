@@ -1,4 +1,6 @@
 const scene = document.querySelector('a-scene');
+
+// Objekt zur Speicherung des Spielzustands
 let gameState = {
     score: 0,
     misses: 0,
@@ -9,6 +11,8 @@ let gameState = {
 
 let gameTimer = null;
 
+// Funktion: updateUI
+// Aktualisiert die UI-Elemente mit aktuellen Werten
 function updateUI() {
     document.getElementById('score').textContent = gameState.score;
     document.getElementById('misses').textContent = gameState.misses;
@@ -18,6 +22,8 @@ function updateUI() {
     document.getElementById('timer').textContent = gameState.timeLeft;
 }
 
+// Funktion: spawnTargets
+// Erzeugt eine definierte Anzahl an Kugeln mit Zufallsposition und Größe
 function spawnTargets(count = 10) {
     for (let i = 0; i < count; i++) {
         const target = document.createElement('a-sphere');
@@ -25,12 +31,16 @@ function spawnTargets(count = 10) {
         target.setAttribute('radius', radius);
         target.setAttribute('color', '#FF4444');
         target.setAttribute('class', 'target');
+        
+        // Zufällige Position innerhalb eines Radius generieren
         target.setAttribute('position', getRandomPosition());
         target.setAttribute('animation__pulse', 'property: scale; to: 1.2 1.2 1.2; dur: 500; dir: alternate; loop: true');
         scene.appendChild(target);
     }
 }
 
+// Funktion: getRandomPosition
+// Gibt eine zufällige Position im Raum zurück (rund um die Kamera)
 function getRandomPosition() {
     const radius = Math.random() * 5 + 3;
     const angle = Math.random() * 2 * Math.PI;
@@ -40,6 +50,8 @@ function getRandomPosition() {
     return `${x} ${y} ${z}`;
 }
 
+// Funktion: destroyTarget
+// Entfernt ein Ziel aus der Szene und aktualisiert Score/Misses
 function destroyTarget(el, hit) {
     if (!el) return;
 
@@ -56,14 +68,15 @@ function destroyTarget(el, hit) {
     updateUI();
 
     if (gameState.score >= 30) {
+        // Zeigt Spielende-Overlay mit Ergebnis
         endGame("GEWONNEN!");
     } else if (gameState.gameActive) {
-        spawnTargets(1);
+        spawnTargets(1); // Neue Kugel nach Treffer
     }
 }
 
+// Klick-Event zum Zielen und Treffen von Kugeln
 let lastClickTime = 0;
-
 scene.addEventListener('click', (event) => {
     if (!gameState.gameActive) return;
 
@@ -72,8 +85,9 @@ scene.addEventListener('click', (event) => {
     lastClickTime = now;
 
     const camera = document.querySelector('[camera]');
+    // Raycaster zum Erkennen getroffener Objekte
     const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2(0, 0);
+    const mouse = new THREE.Vector2(0, 0); // zentriert
 
     raycaster.setFromCamera(mouse, camera.getObject3D('camera'));
     const intersects = raycaster.intersectObjects(scene.object3D.children, true);
@@ -94,11 +108,9 @@ scene.addEventListener('click', (event) => {
     }
 });
 
+// Funktion: startTimer
+// Startet den Countdown und beendet das Spiel bei 0 Sekunden
 function startTimer() {
-    if (gameTimer) {
-        clearInterval(gameTimer);
-    }
-    
     gameTimer = setInterval(() => {
         if (!gameState.gameActive) {
             clearInterval(gameTimer);
@@ -113,108 +125,51 @@ function startTimer() {
     }, 1000);
 }
 
+// Funktion: endGame
+// Zeigt das Endergebnis und blendet das Overlay ein
 function endGame(message) {
     gameState.gameActive = false;
-    
-    // Clear all remaining targets
-    const targets = document.querySelectorAll('.target');
-    targets.forEach(target => target.remove());
-    
-    // Show game over screen
-    const gameOverScreen = document.getElementById('gameOverScreen');
-    const gameOverMessage = document.getElementById('gameOverMessage');
-    const gameStats = document.getElementById('gameStats');
-    
-    gameOverMessage.textContent = message;
-    
-    const total = gameState.score + gameState.misses;
-    const accuracy = total > 0 ? ((gameState.score / total) * 100).toFixed(1) : 0;
-    
-    gameStats.innerHTML = `
-        Treffer: ${gameState.score}<br>
-        Fehlschüsse: ${gameState.misses}<br>
-        Genauigkeit: ${accuracy}%<br>
-        Zeit gespielt: ${60 - gameState.timeLeft}s
-    `;
-    
-    gameOverScreen.style.display = 'flex';
-    
-    // Hide game UI
-    document.getElementById('ui').style.display = 'none';
-    document.getElementById('crosshair').style.display = 'none';
-    document.getElementById('instructions').style.display = 'none';
+    document.getElementById("gameOverScreen").style.display = "flex";
+    document.getElementById("gameOverMessage").textContent = message;
+    document.getElementById("gameStats").innerHTML =
+        `Treffer: ${gameState.score}<br>` +
+        `Verfehlt: ${gameState.misses}<br>` +
+        `Treffsicherheit: ${(gameState.score / (gameState.score + gameState.misses) * 100).toFixed(1)}%`;
 }
 
+// Funktion: startGame
+// Startet das Spiel und blendet alle nötigen UI-Elemente ein
 function startGame() {
-    // Hide start screen
-    document.getElementById('startScreen').style.display = 'none';
-    
-    // Show game UI
-    document.getElementById('ui').style.display = 'block';
-    document.getElementById('crosshair').style.display = 'block';
-    document.getElementById('instructions').style.display = 'block';
-    
-    // Reset game state
-    gameState = {
-        score: 0,
-        misses: 0,
-        gameActive: true,
-        timeLeft: 60,
-        gameStarted: true
-    };
-    
-    // Clear any existing targets
-    const existingTargets = document.querySelectorAll('.target');
-    existingTargets.forEach(target => target.remove());
-    
-    // Start the game
+    gameState.gameActive = true;
+    gameState.gameStarted = true;
+    gameState.score = 0;
+    gameState.misses = 0;
+    gameState.timeLeft = 60;
     updateUI();
+
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("gameOverScreen").style.display = "none";
+    document.getElementById("ui").style.display = "block";
+    document.getElementById("crosshair").style.display = "block";
+    document.getElementById("instructions").style.display = "block";
+
     spawnTargets(10);
     startTimer();
-    
-    // Enable pointer lock after a short delay
-    setTimeout(() => {
-        const camera = document.querySelector('[camera]');
-        if (camera && camera.components['look-controls']) {
-            camera.components['look-controls'].requestPointerLock();
-        }
-    }, 500);
 }
 
+// Funktion: restartGame
+// Wird aufgerufen, wenn der User neu starten möchte
 function restartGame() {
-    // Hide game over screen
-    document.getElementById('gameOverScreen').style.display = 'none';
-    
-    // Clear timer
-    if (gameTimer) {
-        clearInterval(gameTimer);
-    }
-    
-    // Start new game
+    gameState.gameActive = false;
+    gameState.gameStarted = false;
+    clearInterval(gameTimer);
+
+    const targets = document.querySelectorAll('.target');
+    targets.forEach(t => t.remove());
+
     startGame();
 }
 
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    const startButton = document.getElementById('startButton');
-    const restartButton = document.getElementById('restartButton');
-    
-    startButton.addEventListener('click', startGame);
-    restartButton.addEventListener('click', restartGame);
-    
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'F5') {
-            event.preventDefault();
-            if (gameState.gameStarted) {
-                restartGame();
-            }
-        }
-    });
-});
-
-// Wait for A-Frame to load
-window.addEventListener('load', () => {
-    // Initialize UI but don't start game
-    updateUI();
-});
+// Event Listener für Start- und Neustart-Button
+document.getElementById("startButton").addEventListener("click", startGame);
+document.getElementById("restartButton").addEventListener("click", restartGame);
