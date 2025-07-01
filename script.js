@@ -29,7 +29,7 @@ function spawnTargets(count = 10) {
         const target = document.createElement('a-sphere');
         const radius = (Math.random() * 0.3 + 0.2).toFixed(2);
         target.setAttribute('radius', radius);
-        target.setAttribute('material', 'color: #ff4444; shader: flat');
+        target.setAttribute('material', 'color: #ff4444;');
 
         target.setAttribute('class', 'target');
         
